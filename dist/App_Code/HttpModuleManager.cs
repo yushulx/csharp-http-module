@@ -25,8 +25,14 @@ public class HttpModuleManager : IHttpModule
             Directory.CreateDirectory(dir);
         }
 
-        logFile = Path.Combine(dir, "log.txt");
-        mFileHelper = new FileHelper(logFile);
+        // Write record to text file.
+        //logFile = Path.Combine(dir, "log.txt");
+        //mFileHelper = new FileHelper(logFile, false);
+
+        // Write record to db file.
+        logFile = Path.Combine(dir, "record.db");
+        if (mFileHelper == null)
+            mFileHelper = new FileHelper(logFile, true);
 
         context.LogRequest += new EventHandler(OnLogRequest);
     }
@@ -39,7 +45,11 @@ public class HttpModuleManager : IHttpModule
 
         if (url.Contains("dynamsoft.webtwain.min.js"))
         {
-            mFileHelper.WriteLog(context.Request.UserHostAddress);
+            // Write record to text file.
+            //mFileHelper.WriteLog(context.Request.UserHostAddress);
+
+            // Write record to db file.
+            mFileHelper.WriteDB(context.Request.UserHostAddress);
         }
     }
 }

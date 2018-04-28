@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.IO;
+using System.Data.SQLite;
 
 /// <summary>
 /// Summary description for FileHelper
@@ -11,10 +12,53 @@ public class FileHelper
 {
     private string _strFilePath = "";
     private bool enableLog = true;
+    private SQLiteConnection m_dbConnection;
 
-    public FileHelper(string strPath)
+    public FileHelper(string strPath, bool isDB)
     {
         _strFilePath = strPath;
+
+        if (!isDB)
+            return;
+
+        if (!File.Exists(strPath))
+        {
+            SQLiteConnection.CreateFile(strPath);
+            string connectionString = "Data Source=" + strPath + ";Version=3;";
+            m_dbConnection = new SQLiteConnection(connectionString);
+            try
+            {
+                m_dbConnection.Open();
+                string sql = "create table record (content text)";
+                SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
+                int number = command.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+        else
+        {
+            string connectionString = "Data Source=" + strPath + ";Version=3;";
+            m_dbConnection = new SQLiteConnection(connectionString);
+            try
+            {
+                m_dbConnection.Open();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+        }
+    }
+
+    public void Dispose()
+    {
+        if (m_dbConnection != null)
+        {
+            m_dbConnection.Close();
+        }
     }
 
     public void Write(string strMessage)
@@ -62,5 +106,15 @@ public class FileHelper
         }
         catch (Exception)
         { }
+    }
+
+    public void WriteDB(string content)
+    {
+        if (m_dbConnection != null)
+        {
+            string sql = "insert into record (content) values ('" + content + "')";
+            SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection);
+            int number = command.ExecuteNonQuery();
+        }
     }
 }
