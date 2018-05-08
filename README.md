@@ -18,3 +18,6 @@ The workaround is to check the following option in settings.
 3. Build and publish the project to IIS.
 4. Deploy the test folder to another web server.
 5. Visit **index.htm** and then check the log file or db file generated under IIS website folder.
+
+## Blog
+[How to Capture HTTP Request of Static Files Deployed on IIS](http://www.codepool.biz/capture-http-request-static-files-iis.html)
